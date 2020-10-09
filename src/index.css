@@ -16,22 +16,3 @@ code {
   display: flex;
   justify-content: center;
 }
-#button-container {
-  width: 30rem;
-}
-#display {
-  width: 30rem;
-  height: 3rem;
-  border-style: solid;
-  border-width: thin;
-  border-color: black;
-  background: #93c542;
-}
-
-#equals {
-  background: grey;
-}
-
-.blank {
-  background: white;
-}

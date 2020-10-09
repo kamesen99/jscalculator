@@ -1,6 +1,7 @@
 import React from 'react';
-//import logo from './logo.svg';
-import './App.css';
+import { Button } from "@material-ui/core";
+import { withStyles } from "@material-ui/core/styles";
+import styles from "./App.styles";
 
 class App extends React.Component {
   constructor(props) {
@@ -12,22 +13,16 @@ class App extends React.Component {
       operator: "",
       error: "Message"
     }
-    this.handleClickDigit = this.handleClickDigit.bind(this);
-    this.handleClickSymbol = this.handleClickSymbol.bind(this);
-    this.handleClickDecimal = this.handleClickDecimal.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-    this.equals = this.equals.bind(this);
-    this.clear = this.clear.bind(this);
   }
-  handleChange(e) {}
-  
+  handleChange(e) { }
+
   equals() {
     let ans = eval(this.state.total);
     this.setState({
       total: ans
     })
   }
-  
+
   clear() {
     //console.log("Clear")
     this.setState({
@@ -38,15 +33,15 @@ class App extends React.Component {
       operator: ""
     })
   }
-  
-  handleClickDecimal(e){
+
+  handleClickDecimal(e) {
     var dec = true;
     this.handleClickDigit(e, dec);
   }
-  
-  handleClickSymbol(e){
+
+  handleClickSymbol(e) {
     //console.log("clicked a symbol");
-    var symbol =  true;
+    var symbol = true;
     var dec = false;
     this.setState({
       operator: e.target.value,
@@ -55,13 +50,13 @@ class App extends React.Component {
     //console.log(this.state.operator)
     this.handleClickDigit(e, dec, symbol);
   }
-  
+
   //Simplify this by passing a prop which tells the function what type of character I'm passing?
-  handleClickDigit(e, dec, symbol) {
-    
+  handleClickDigit = (e, dec, symbol) => {
+    const digit = e.target.value;
     const endsWithOperator = /[*+/-]$/;
     const endsWithNegativeSign = /.*[*/+]-$/;
-      
+
     //console.log(e.target.value)
     if (this.state.total === "0") {
       this.setState({
@@ -69,14 +64,14 @@ class App extends React.Component {
         total: e.target.value,
         sub: e.target.value
       })
-    } 
-    
+    }
+
     else if (dec) { //If decimal, check for previous dec
       //console.log("DEC = true")
       let testRegex = /\.[^.]*\./;
       let testStr = this.state.sub.concat(e.target.value);
-      
-      if(testRegex.test(testStr)) {
+
+      if (testRegex.test(testStr)) {
         this.setState({
           error: "Two decimal characters not allowed",
           operator: "."
@@ -88,22 +83,22 @@ class App extends React.Component {
           sub: this.state.sub.concat(e.target.value),
           last: e.target.value
         })
-      } 
-    } 
-    
+      }
+    }
+
     else if (dec === false && symbol === false) {
-        //console.log("DEC = false")
-        //if the previous char was not an operator
-        if (this.state.operator === "") {
-          //console.log("operator is blank")
-          this.setState({
-            last: e.target.value,
-            total: this.state.total.concat(e.target.value),
-            operator: e.target.value,
-            sub: ""
-          })
-        } 
-        
+      //console.log("DEC = false")
+      //if the previous char was not an operator
+      if (this.state.operator === "") {
+        //console.log("operator is blank")
+        this.setState({
+          last: e.target.value,
+          total: this.state.total.concat(e.target.value),
+          operator: e.target.value,
+          sub: ""
+        })
+      }
+
       else {
         //console.log("hit exception")
         //console.log(e.target.value)
@@ -116,7 +111,7 @@ class App extends React.Component {
         //   })
       }
     }
-    
+
     else if (symbol === true && dec === false) {
       //const isOperator = /[/+‑\*]/
       //console.log("symbol = true")
@@ -124,14 +119,14 @@ class App extends React.Component {
       //console.log(this.state.total.slice(-1))
       //console.log(isOperator.test(this.state.total.slice(-1)))
       // was last character an operator?
-      
+
       if (!endsWithOperator.test(this.state.total)) {
         //console.log("does not end with operator")
         //console.log(this.state.total)
         this.setState({
           last: this.state.total,
           total: this.state.total + e.target.value
-        });  
+        });
         //
       } else if (!endsWithNegativeSign.test(this.state.total)) {
         //console.log(this.state.total)
@@ -153,63 +148,75 @@ class App extends React.Component {
         //console.log("hit exception")
       }
     }
-    
+
     //just a digit being passed
     else {
       //console.log("hit exception, just a digit")
       //console.log(this.state.sub)
-        this.setState({
-          last: e.target.value,
-          total: this.state.total.concat(e.target.value)
-          //sub: this.state.sub.concat(e.target.value)
-        })
+      this.setState({
+        last: e.target.value,
+        total: this.state.total.concat(e.target.value)
+        //sub: this.state.sub.concat(e.target.value)
+      })
     }
     //console.log(this.state)
   }
 
+  renderCalculatorButton = val => {
+    return (
+      <Button color="primary" value={val} id={val} onClick={this.handleClickDigit}>{val}</Button>
+    )
+  }
+
   render() {
     //console.log(this.state.operator);
-    return(
-      <div id="calculator">
-        <h3 className="text-center" id="display">{this.state.total}</h3>
-        <div id="button-container">
-        <div className="row">
-          <button className="btn btn-primary col-xs-3" value="1" id="one" onClick={this.handleClickDigit}>1</button>
-          <button className="btn btn-primary col-xs-3" value="2" id="two" onClick={this.handleClickDigit}>2</button>
-          <button className="btn btn-primary col-xs-3" value="3" id="three" onClick={this.handleClickDigit}>3</button>
-          <button className="btn btn-info col-xs-3" id="add" value="+" onClick={this.handleClickSymbol}>+</button>
+    const { classes } = this.props;
+
+    return (
+      <div className={classes.calcContainer}>
+        <div className={classes.headerRow}>
+          <h3 className={classes.informationDisplay} id="display">{this.state.total}</h3>
         </div>
-        <div className="row">
-          <button className="btn btn-primary col-xs-3" value="4" id="four" onClick={this.handleClickDigit}>4</button>
-          <button className="btn btn-primary col-xs-3" value="5" id="five" onClick={this.handleClickDigit}>5</button>
-          <button className="btn btn-primary col-xs-3" value="6" id="six" onClick={this.handleClickDigit}>6</button>
-          <button className="btn btn-info col-xs-3" id="subtract" value="-" onClick={this.handleClickSymbol}>-</button>
+        <div className={classes.row}>
+          <Button color="primary" variant="contained" className={classes.numberButton} value="1" id="one" onClick={this.handleClickDigit}>1</Button>
+          <Button color="primary" variant="contained" className={classes.numberButton} value="2" id="two" onClick={this.handleClickDigit}>2</Button>
+          <Button color="primary" variant="contained" className={classes.numberButton} value="3" id="three" onClick={this.handleClickDigit}>3</Button>
+          <Button color="default" variant="contained" className={classes.operatorButton} id="add" value="+" onClick={this.handleClickSymbol}>+</Button>
         </div>
-        <div className="row">
-          <button className="btn btn-primary col-xs-3" value="7" id="seven" onClick={this.handleClickDigit}>7</button>
-          <button className="btn btn-primary col-xs-3" value="8" id="eight" onClick={this.handleClickDigit}>8</button>
-          <button className="btn btn-primary col-xs-3" value="9" id="nine" onClick={this.handleClickDigit}>9</button>
-          <button className="btn btn-info col-xs-3" id="multiply" value="*" onClick={this.handleClickSymbol}>*</button>
+        <div className={classes.row}>
+          <Button color="primary" variant="contained" className={classes.numberButton} value="4" id="four" onClick={this.handleClickDigit}>4</Button>
+          <Button color="primary" variant="contained" className={classes.numberButton} value="5" id="five" onClick={this.handleClickDigit}>5</Button>
+          <Button color="primary" variant="contained" className={classes.numberButton} value="6" id="six" onClick={this.handleClickDigit}>6</Button>
+          <Button id="subtract" color="default" variant="contained" value="-" className={classes.operatorButton} onClick={this.handleClickSymbol}>-</Button>
         </div>
-        <div className="row">
-          <button className="btn btn-info col-xs-3" id="decimal" value="." onClick={this.handleClickDecimal}>.</button>
-          <button className="btn btn-primary col-xs-3" value="0" id="zero" onClick={this.handleClickDigit}>0</button>
-          <button className="btn btn-secondary col-xs-3" id="equals" onClick={this.equals}>=</button>
-          <button className="btn btn-info col-xs-3" id="divide" value="/" onClick={this.handleClickSymbol}>/</button>
+        <div className={classes.row}>
+          <Button color="primary" variant="contained" className={classes.numberButton} value="7" id="seven" onClick={this.handleClickDigit}>7</Button>
+          <Button color="primary" variant="contained" className={classes.numberButton} value="8" id="eight" onClick={this.handleClickDigit}>8</Button>
+          <Button color="primary" variant="contained" className={classes.numberButton} value="9" id="nine" onClick={this.handleClickDigit}>9</Button>
+          <Button id="multiply" color="default" variant="contained" value="*" className={classes.operatorButton} onClick={this.handleClickSymbol}>*</Button>
         </div>
-        <div className="row">
-          <button className="btn col-xs-3 blank"></button>
-          <button className="btn col-xs-3 blank"></button>
-          <button className="btn col-xs-3 blank"></button>
-          <button className="btn btn-danger col-xs-3" id="clear" onClick={this.clear}>C</button>
+        <div className={classes.row}>
+          <Button id="decimal" color="default" variant="contained" className={classes.operatorButton} value="." onClick={this.handleClickDecimal}>.</Button>
+          <Button id="zero" color="primary" variant="contained" className={classes.numberButton} value="0" onClick={this.handleClickDigit}>0</Button>
+          <Button id="equals" color="default" variant="contained" className={classes.operatorButton} onClick={this.equals}>=</Button>
+          <Button id="divide" color="default" variant="contained" className={classes.operatorButton} value="/" onClick={this.handleClickSymbol}>/</Button>
         </div>
+        <div className={classes.row}>
+          <div className={classes.numberButton} />
+          <div className={classes.numberButton} />
+          <div className={classes.numberButton} />
+          <Button color="secondary" variant="contained" id="clear" className={classes.numberButton} onClick={this.clear}>C</Button>
         </div>
-        <h5 className="text-left">Status: {this.state.error}</h5>
+        <div className={classes.row}>
+          <h5 className="text-left">Status: {this.state.error}</h5>
+        </div>
+
         <div id="test">
-          
+
         </div>
-      </div>
+      </div >
     )
   }
 }
-export default App;
+
+export default withStyles(styles)(App);
